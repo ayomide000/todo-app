@@ -8,6 +8,8 @@ import {
   query,
   updateDoc,
   doc,
+  addDoc,
+  deleteDoc,
 } from "firebase/firestore";
 
 const style = {
@@ -22,8 +24,22 @@ const style = {
 
 function App() {
   const [todos, setTodos] = useState([]);
+  const [input, setInput] = useState("");
 
   // Create todo
+  const createTodo = async (e) => {
+    e.preventDefault(e);
+    if (input === "") {
+      alert("Please enter a valid todo");
+      return;
+    }
+    await addDoc(collection(db, "todos"), {
+      text: input,
+      completed: false,
+    });
+    setInput("");
+  };
+
   // Read todo from firebase
   useEffect(() => {
     const q = query(collection(db, "todos"));
@@ -43,14 +59,24 @@ function App() {
       completed: !todo.completed,
     });
   };
+
   // Delete todo
+  const deleteTodo = async (id) => {
+    await deleteDoc(doc(db, "todos", id));
+  };
 
   return (
     <div className={style.bg}>
       <div className={style.container}>
         <div className={style.heading}>Todo App</div>
-        <form className={style.form}>
-          <input type="text" className={style.input} placeholder="Add Todo" />
+        <form onSubmit={createTodo} className={style.form}>
+          <input
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            type="text"
+            className={style.input}
+            placeholder="Add Todo"
+          />
           <button className={style.button}>
             <AiOutlinePlus size={30} />
           </button>
@@ -58,11 +84,18 @@ function App() {
         <ul>
           {todos.map((todo, index) => {
             return (
-              <Todo key={index} todo={todo} toggleComplete={toggleComplete} />
+              <Todo
+                key={index}
+                todo={todo}
+                toggleComplete={toggleComplete}
+                deleteTodo={deleteTodo}
+              />
             );
           })}
         </ul>
-        <p className={style.count}>You have 2 todos</p>
+        {todos.length < 1 ? null : (
+          <p className={style.count}>{`You have ${todos.length} todos`}</p>
+        )}
       </div>
     </div>
   );

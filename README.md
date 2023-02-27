@@ -1,3 +1,7 @@
+# Todo App
+
+This Project is built with React with Firebase Back-End and Styled with Tailwind CSS
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
